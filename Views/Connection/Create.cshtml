@@ -1,0 +1,36 @@
+﻿@model VPN_RDP_Manager_Web.Models.Connection
+
+<h2>Yeni Bağlantı Ekle</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label>Kurum</label>
+        <input class="form-control" asp-for="KURUM" />
+    </div>
+    <div class="form-group">
+        <label>Tip</label>
+        <input class="form-control" asp-for="TIP" />
+    </div>
+    <div class="form-group">
+        <label>IP</label>
+        <input class="form-control" asp-for="IP" />
+    </div>
+    <div class="form-group">
+        <label>Port</label>
+        <input class="form-control" asp-for="PORT" />
+    </div>
+    <div class="form-group">
+        <label>Kullanıcı</label>
+        <input class="form-control" asp-for="KULLANICI" />
+    </div>
+    <div class="form-group">
+        <label>Şifre</label>
+        <input type="password" class="form-control" asp-for="SIFRE" />
+    </div>
+    <div class="form-group">
+        <label>Notlar</label>
+        <textarea class="form-control" asp-for="NOTLAR"></textarea>
+    </div>
+    <button type="submit" class="btn btn-success mt-2">Kaydet</button>
+    <a class="btn btn-secondary mt-2" href="@Url.Action("Index")">İptal</a>
+</form>

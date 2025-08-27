@@ -1,0 +1,61 @@
+﻿@model VPN_RDP_Manager_Web.Models.Connection
+
+@{
+    ViewData["Title"] = "Düzeltme";
+}
+
+<h2>Düzeltme - @Model.KURUM</h2>
+
+<form asp-action="Edit" method="post">
+    @* EF için gerekli: SYS_NO hidden *@
+    <input type="hidden" asp-for="SYS_NO" />
+
+    <div class="mb-3">
+        <label asp-for="KURUM" class="form-label"></label>
+        <input asp-for="KURUM" class="form-control" />
+        <span asp-validation-for="KURUM" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="TIP" class="form-label"></label>
+        <input asp-for="TIP" class="form-control" />
+        <span asp-validation-for="TIP" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="IP" class="form-label"></label>
+        <input asp-for="IP" class="form-control" />
+        <span asp-validation-for="IP" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PORT" class="form-label"></label>
+        <input asp-for="PORT" class="form-control" />
+        <span asp-validation-for="PORT" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="KULLANICI" class="form-label"></label>
+        <input asp-for="KULLANICI" class="form-control" />
+        <span asp-validation-for="KULLANICI" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SIFRE" class="form-label"></label>
+        <input asp-for="SIFRE" type="text" class="form-control" />
+        <span asp-validation-for="SIFRE" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NOTLAR" class="form-label"></label>
+        <textarea asp-for="NOTLAR" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="NOTLAR" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success me-2">Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,63 @@
+﻿@model IEnumerable<VPN_RDP_Manager_Web.Models.Connection>
+
+
+    <a class="btn btn-primary mb-3" href="@Url.Action("Create")">Yeni Bağlantı Ekle</a>
+
+    <table class="table table-bordered w-100" id="connectionTable">
+        <thead class="table-dark">
+            <tr>
+                <th>SYS_NO</th>
+                <th>KURUM</th>
+                <th>TIP</th>
+                <th>IP</th>
+                <th>PORT</th>
+                <th>KULLANICI</th>
+                <th style="min-width:220px;">ŞİFRE</th>
+                <th style="min-width:200px;">NOTLAR</th>
+                <th>KAYIT_ANI</th>
+                <th>İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr data-kurum="@item.KURUM">
+                    <td>@item.SYS_NO</td>
+                    <td>@item.KURUM</td>
+                    <td>@item.TIP</td>
+                    <td>
+                        <div class="d-flex ip-container">
+                            <input class="form-control me-1" id="ip_@item.SYS_NO" value="@item.IP" readonly />
+                            <button type="button" class="btn btn-info btn-sm" onclick="copyIp(@item.SYS_NO)">📋</button>
+                        </div>
+                    </td>
+                    <td>@item.PORT</td>
+                    <td>
+                        <div class="d-flex user-container">
+                            <input class="form-control me-1" id="user_@item.SYS_NO" value="@item.KULLANICI" readonly />
+                            <button type="button" class="btn btn-info btn-sm" onclick="copyUser(@item.SYS_NO)">📋</button>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="d-flex pwd-container">
+                            <input type="password" class="form-control me-1" id="pwd_@item.SYS_NO" value="@item.SIFRE" readonly />
+                            <button type="button" class="btn btn-secondary me-1 btn-sm" onclick="togglePassword(@item.SYS_NO)">👁</button>
+                            <button type="button" class="btn btn-info btn-sm" onclick="copyPassword(@item.SYS_NO)">📋</button>
+                        </div>
+                    </td>
+                    <td>@item.NOTLAR</td>
+                    <td>@item.KAYIT_ANI</td>
+                    <td>
+                        <div class="btn-group">
+                            <a asp-action="Edit" asp-route-id="@item.SYS_NO" class="btn btn-warning btn-sm">✏️ Düzelt</a>
+                            <form asp-action="Delete" asp-route-id="@item.SYS_NO" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm">🗑️ Sil</button>
+                            </form>
+                        </div>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

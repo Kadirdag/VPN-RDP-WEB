@@ -1,0 +1,154 @@
+﻿@model IEnumerable<VPN_RDP_Manager_Web.Models.Connection>
+
+<style>
+    /* Tüm tablo satırlarının padding’i küçültüldü */
+    table#connectionTable tbody tr td, 
+    table#connectionTable tbody tr th {
+        padding: 0.25rem 0.5rem; /* üst-alt 0.25rem, sağ-sol 0.5rem */
+        vertical-align: middle;
+    }
+
+    /* Hover efekti */
+    table#connectionTable tbody tr:hover {
+        background-color: #ffe5b4; /* hafif turuncu */
+    }
+
+    /* Zebra striping */
+    table#connectionTable tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    /* Şifre input ve butonlar daha kompakt */
+    .pwd-container input {
+        height: 28px;
+        font-size: 0.9rem;
+    }
+    .pwd-container button {
+        padding: 2px 6px;
+        font-size: 0.8rem;
+    }
+</style>
+
+
+<div class="d-flex" style="height:100vh;">
+    <!-- Sol Menü -->
+    <div class="bg-light p-3" style="width:220px; height:100%; position:fixed; left:0; top:0; overflow-y:auto;">
+        <h5 class="text-start">Kurumlar</h5>
+        <ul class="list-group">
+            <li class="list-group-item text-start">
+                <a href="#" onclick="filterByKurum('')">Tümü</a>
+            </li>
+            @foreach (var kurum in Model.Select(m => m.KURUM).Distinct())
+            {
+                <li class="list-group-item text-start">
+                    <a href="#" onclick="filterByKurum('@kurum')">@kurum</a>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <!-- Sağ Taraf Tablo -->
+    <div class="flex-grow-1 p-3" style="margin-left:150; height:100%;">
+        <h2>Connections</h2>
+        <a class="btn btn-primary mb-3" href="@Url.Action("Create")">Yeni Bağlantı Ekle</a>
+
+        <table class="table table-bordered w-100" id="connectionTable">
+            <thead class="table-dark">
+                <tr>
+                    <th>SYS_NO</th>
+                    <th>KURUM</th>
+                    <th style="min-width:200px;">NOTLAR</th>
+                    <th>IP</th>
+                    <th>PORT</th>
+                    <th>KULLANICI</th>
+                    <th style="min-width:220px;">ŞİFRE</th>
+                    <th>TIP</th>
+                    <th>KAYIT_ANI</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr data-kurum="@item.KURUM">
+                        <td>@item.SYS_NO</td>
+                        <td>@item.KURUM</td>
+                        <td>@item.NOTLAR</td>
+                        <td>
+                            <div class="d-flex ip-container">
+                                <input class="form-control me-1" id="ip_@item.SYS_NO" value="@item.IP" readonly />
+                                <button type="button" class="btn btn-info btn-sm" onclick="copyIp(@item.SYS_NO)">📋</button>
+                            </div>
+                        </td>
+                        <td>@item.PORT</td>
+                        <td>
+                            <div class="d-flex user-container">
+                                <input class="form-control me-1" id="user_@item.SYS_NO" value="@item.KULLANICI" readonly />
+                                <button type="button" class="btn btn-info btn-sm" onclick="copyUser(@item.SYS_NO)">📋</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex pwd-container">
+                                <input type="password" class="form-control me-1" id="pwd_@item.SYS_NO" value="@item.SIFRE" readonly />
+                                <button type="button" class="btn btn-secondary me-1 btn-sm" onclick="togglePassword(@item.SYS_NO)">👁</button>
+                                <button type="button" class="btn btn-info btn-sm" onclick="copyPassword(@item.SYS_NO)">📋</button>
+                            </div>
+                        </td>
+                        <td>@item.TIP</td>
+                        <td>@item.KAYIT_ANI</td>
+                        <td>
+                            <div class="btn-group">
+                                <a asp-action="Edit" asp-route-id="@item.SYS_NO" class="btn btn-warning btn-sm">✏️ Düzelt</a>
+                                <form asp-action="Delete" asp-route-id="@item.SYS_NO" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm">🗑️ Sil</button>
+                                </form>
+                            </div>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function togglePassword(id) {
+        var input = document.getElementById("pwd_" + id);
+        input.type = (input.type === "password") ? "text" : "password";
+    }
+
+    function copyPassword(id) {
+        var input = document.getElementById("pwd_" + id);
+        input.type = "text";
+        input.select();
+        input.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        input.type = "password";
+    }
+
+    function copyUser(id) {
+        var copyText = document.getElementById("user_" + id);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+    }
+
+       function copyIp(id) {
+        var copyText = document.getElementById("ip_" + id);
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        navigator.clipboard.writeText(copyText.value);
+    }
+
+    function filterByKurum(kurum) {
+        var rows = document.querySelectorAll("#connectionTable tbody tr");
+        rows.forEach(row => {
+            if (kurum === "" || row.getAttribute("data-kurum") === kurum) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+</script>

@@ -1,0 +1,19 @@
+﻿@model VPN_RDP_Manager_Web.Models.Connection
+
+<h2>Bağlantıyı Sil</h2>
+
+<p>Bu bağlantıyı silmek istediğinizden emin misiniz?</p>
+
+<div class="mb-3">
+    <strong>Kurum:</strong> @Model.KURUM<br />
+    <strong>Tip:</strong> @Model.TIP<br />
+    <strong>IP:</strong> @Model.IP<br />
+    <strong>Port:</strong> @Model.PORT<br />
+    <strong>Kullanıcı:</strong> @Model.KULLANICI<br />
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="SYS_NO" />
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a class="btn btn-secondary" href="@Url.Action("Index")">İptal</a>
+</form>

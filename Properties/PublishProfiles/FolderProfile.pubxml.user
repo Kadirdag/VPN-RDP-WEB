@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+https://go.microsoft.com/fwlink/?LinkID=208121.
+-->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\KDR\OPTIMUS_ASP\VPN-RDP\IIS</_PublishTargetUrl>
+    <History>True|2025-08-25T11:04:44.3032956Z;True|2025-08-22T11:09:58.8341994+03:00;True|2025-08-21T17:19:26.9934895+03:00;True|2025-08-21T17:19:16.3948393+03:00;True|2025-08-21T13:13:03.3111187+03:00;True|2025-08-21T09:54:48.6276233+03:00;False|2025-08-21T09:54:35.5860654+03:00;True|2025-08-19T13:33:25.3468798+03:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+</Project>
