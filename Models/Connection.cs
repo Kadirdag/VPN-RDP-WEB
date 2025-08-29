@@ -28,5 +28,6 @@ namespace VPN_RDP_Manager_Web.Models
         public string? NOTLAR { get; set; }
 
         public DateTime KAYIT_ANI { get; set; }
+        public string? KULLANICI_KODU { get; internal set; }
     }
 }

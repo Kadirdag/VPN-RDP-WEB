@@ -7,16 +7,27 @@ namespace VPN_RDP_Manager_Web.Controllers
     public class ConnectionController : Controller
     {
         private readonly VPNContext _context;
+        private readonly IConfiguration _config; // IConfiguration eklendi
 
-        public ConnectionController(VPNContext context)
+        public ConnectionController(VPNContext context, IConfiguration config)
         {
-            _context = context;
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         // Index
         public IActionResult Index()
         {
-            var connections = _context.CONNECTIONS.ToList();
+            if (_config == null)
+                return Content("Config null!");
+
+            string kullaniciKodu = _config["KULLANICI_KODU"];
+            if (string.IsNullOrEmpty(kullaniciKodu))
+                return Content("KULLANICI_KODU null veya boş!");
+
+            var connections = _context.CONNECTIONS
+                                      .Where(c => c.KULLANICI_KODU == kullaniciKodu)
+                                      .ToList();
             return View(connections);
         }
 
@@ -34,6 +45,8 @@ namespace VPN_RDP_Manager_Web.Controllers
             if (ModelState.IsValid)
             {
                 connection.KAYIT_ANI = DateTime.Now;
+                connection.KULLANICI_KODU = _config["KULLANICI_KODU"]; // otomatik set
+
                 _context.CONNECTIONS.Add(connection);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
@@ -45,7 +58,11 @@ namespace VPN_RDP_Manager_Web.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var connection = _context.CONNECTIONS.FirstOrDefault(c => c.SYS_NO == id);
+            string kullaniciKodu = _config["KULLANICI_KODU"];
+
+            var connection = _context.CONNECTIONS
+                .FirstOrDefault(c => c.SYS_NO == id && c.KULLANICI_KODU == kullaniciKodu);
+
             if (connection == null)
                 return NotFound();
 
@@ -62,9 +79,11 @@ namespace VPN_RDP_Manager_Web.Controllers
 
             if (ModelState.IsValid)
             {
-                // ExecuteUpdate kullanarak trigger ile uyumlu şekilde güncelle
+                string kullaniciKodu = _config["KULLANICI_KODU"];
+
+                // ExecuteUpdate ile güncelleme (sadece ilgili kullanıcıya ait kaydı günceller)
                 var rowsAffected = _context.CONNECTIONS
-                    .Where(c => c.SYS_NO == id)
+                    .Where(c => c.SYS_NO == id && c.KULLANICI_KODU == kullaniciKodu)
                     .ExecuteUpdate(s => s
                         .SetProperty(c => c.KURUM, connection.KURUM)
                         .SetProperty(c => c.TIP, connection.TIP)
@@ -80,6 +99,7 @@ namespace VPN_RDP_Manager_Web.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
+
             return View(connection);
         }
 
@@ -88,9 +108,11 @@ namespace VPN_RDP_Manager_Web.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Delete(int id)
         {
-            // ExecuteDelete ile trigger ile uyumlu silme
+            string kullaniciKodu = _config["KULLANICI_KODU"];
+
+            // ExecuteDelete ile sadece ilgili kullanıcıya ait kaydı sil
             var rowsAffected = _context.CONNECTIONS
-                .Where(c => c.SYS_NO == id)
+                .Where(c => c.SYS_NO == id && c.KULLANICI_KODU == kullaniciKodu)
                 .ExecuteDelete();
 
             if (rowsAffected == 0)
@@ -98,6 +120,7 @@ namespace VPN_RDP_Manager_Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
 
         public IActionResult Filter(string kurum)
         {

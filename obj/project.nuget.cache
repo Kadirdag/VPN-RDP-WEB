@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "NvfVJKKF5XYyPLb8APfARGG9Rt4XieD/CH6ljmmCw8SAmtmL0623keWw0U6e9TWKq2msc08gtIbICexCfAC5Nw==",
+  "dgSpecHash": "5ps3APaDSWh1N7SlfSI2wOL0EJMU+ka7zFzdv9ZS/B/7N/fXbMbG9KAeKzMnVbWYHs+9C7xeMm/1xOFHu60kFQ==",
   "success": true,
-  "projectFilePath": "C:\\KDR\\SERVİSLER\\kdr_projeler\\VPN-RDP\\VPN-RDP.csproj",
+  "projectFilePath": "C:\\KDR\\SERVİSLER\\kdr_projeler\\VPN-RDP\\VPN-RDP-WEB\\VPN-RDP.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Kadir Dağ\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\Kadir Dağ\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
