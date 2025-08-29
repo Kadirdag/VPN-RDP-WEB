@@ -184,7 +184,8 @@ AS
 RETURN
 ```
 
-
-
-
+Ekranlarda kullanıcı bazlı ekrana getirme için gerekli
+```
+ALTER TABLE CONNECTIONS ADD KULLANICI_KODU NVARCHAR(50) NULL;
+```
 
