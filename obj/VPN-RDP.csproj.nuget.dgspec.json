@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\KDR\\SERVİSLER\\kdr_projeler\\VPN-RDP\\VPN-RDP-WEB\\VPN-RDP.csproj": {}
+    "C:\\KADIR\\KDR\\PROJELER\\PROJE\\VPN-RDP-WEB\\VPN-RDP.csproj": {}
   },
   "projects": {
-    "C:\\KDR\\SERVİSLER\\kdr_projeler\\VPN-RDP\\VPN-RDP-WEB\\VPN-RDP.csproj": {
+    "C:\\KADIR\\KDR\\PROJELER\\PROJE\\VPN-RDP-WEB\\VPN-RDP.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\KDR\\SERVİSLER\\kdr_projeler\\VPN-RDP\\VPN-RDP-WEB\\VPN-RDP.csproj",
+        "projectUniqueName": "C:\\KADIR\\KDR\\PROJELER\\PROJE\\VPN-RDP-WEB\\VPN-RDP.csproj",
         "projectName": "VPN-RDP",
-        "projectPath": "C:\\KDR\\SERVİSLER\\kdr_projeler\\VPN-RDP\\VPN-RDP-WEB\\VPN-RDP.csproj",
+        "projectPath": "C:\\KADIR\\KDR\\PROJELER\\PROJE\\VPN-RDP-WEB\\VPN-RDP.csproj",
         "packagesPath": "C:\\Users\\Kadir Dağ\\.nuget\\packages\\",
-        "outputPath": "C:\\KDR\\SERVİSLER\\kdr_projeler\\VPN-RDP\\VPN-RDP-WEB\\obj\\",
+        "outputPath": "C:\\KADIR\\KDR\\PROJELER\\PROJE\\VPN-RDP-WEB\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Kadir Dağ\\AppData\\Roaming\\NuGet\\NuGet.Config",
