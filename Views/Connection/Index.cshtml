@@ -27,30 +27,60 @@
         padding: 2px 6px;
         font-size: 0.8rem;
     }
+
+    .list-group-item.active-kurum {
+        background-color: #007bff; /* Bootstrap primary rengi */
+        color: white;
+        font-weight: bold;
+        border-color: #007bff;
+    }
+
+        .list-group-item.active-kurum a {
+            color: white !important; /* Link rengini beyaz yap */
+        }
+
+    .kurum-separator {
+        border-top: 1px solid #ccc;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
 </style>
 
 
-<div class="d-flex" style="height:100vh;">
-    <!-- Sol Menü -->
-    <div class="bg-light p-3" style="width:220px; height:100%; position:fixed; left:0; top:0; overflow-y:auto;">
-        <h5 class="text-start">Kurumlar</h5>
-        <ul class="list-group">
-            <li class="list-group-item text-start">
-                <a href="#" onclick="filterByKurum('')">Tümü</a>
+<div class="bg-light p-3" style="width:220px; height:100%; position:fixed; left:0; top:0; overflow-y:auto; border-right: 1px solid #ddd;">
+    <h5 class="text-start mb-3">
+        <i class="fas fa-building me-2"></i> **Kurumlar**
+    </h5>
+
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item text-start active-kurum" data-kurum-id="">
+            <a href="#" onclick="filterByKurum('')">Tümü</a>
+        </li>
+    </ul>
+
+    <div class="kurum-separator"></div>
+
+    <ul class="list-group list-group-flush" id="kurum-listesi">
+        @foreach (var kurum in Model.Select(m => m.KURUM).Distinct().OrderBy(k => k))
+        {
+            <li class="list-group-item text-start" data-kurum-id="@kurum">
+                <a href="#" onclick="filterByKurum('@kurum')">@kurum</a>
             </li>
-            @foreach (var kurum in Model.Select(m => m.KURUM).Distinct())
-            {
-                <li class="list-group-item text-start">
-                    <a href="#" onclick="filterByKurum('@kurum')">@kurum</a>
-                </li>
-            }
-        </ul>
-    </div>
+        }
+    </ul>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
 
     <!-- Sağ Taraf Tablo -->
     <div class="flex-grow-1 p-3" style="margin-left:150; height:100%;">
         <h2>Optimus Yazılım VPN-RDP Bilgileri</h2>
         <a class="btn btn-primary mb-3" href="@Url.Action("Create")">Yeni Bağlantı Ekle</a>
+
+    <input type="text" id="quickSearch" class="form-control w-25"
+           placeholder="Tabloda Ara (IP, Not, Kullanıcı...)"
+           onkeyup="filterTable()">
+    </div>
 
         <table class="table table-bordered w-100" id="connectionTable">
             <thead class="table-dark">
@@ -58,7 +88,7 @@
                     <th>SYS_NO</th>
                     <th>KURUM</th>
                     <th style="min-width:200px;">NOTLAR</th>
-                    <th>IPX</th>
+                    <th style="min-width:200px;">IPX</th>
                     <th>PORT</th>
                     <th>KULLANICI</th>
                     <th style="min-width:220px;">ŞİFRE</th>
@@ -118,13 +148,64 @@
         input.type = (input.type === "password") ? "text" : "password";
     }
 
+    function filterTable() {
+        // Kurum filtresi aktifse iptal etmiyoruz, sadece görüntülenen satırlarda arama yapıyoruz.
+        var input = document.getElementById("quickSearch");
+        var filter = input.value.toUpperCase();
+        var table = document.getElementById("connectionTable");
+        var tr = table.getElementsByTagName("tr");
+
+        // Aktif kurum filtresini bul (eğer varsa)
+        var activeKurum = document.querySelector('.list-group-item.active-kurum');
+        var currentKurumFilter = activeKurum ? activeKurum.getAttribute('data-kurum-id') : "";
+
+        // Başlık satırını atlamak için i = 1'den başlat
+        for (i = 1; i < tr.length; i++) {
+            var row = tr[i];
+            var kurumData = row.getAttribute("data-kurum");
+            var rowText = row.innerText.toUpperCase(); // Tüm satırın içeriğini al
+
+            var kurumMatch = (currentKurumFilter === "" || kurumData === currentKurumFilter);
+            var searchMatch = (rowText.indexOf(filter) > -1);
+
+            if (kurumMatch && searchMatch) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        }
+    }
+
+    function showCopyFeedback(elementId, message = "Kopyalandı!") {
+        var element = document.getElementById(elementId);
+
+        // Kopyalama mesajı için geçici bir span oluştur
+        var feedback = document.createElement("span");
+        feedback.className = "text-success ms-2 fw-bold position-absolute";
+        feedback.style.fontSize = "0.75rem";
+        feedback.style.whiteSpace = "nowrap";
+        feedback.style.right = "0";
+        feedback.textContent = message;
+
+        // Kapsayıcıya göre pozisyon ayarla
+        element.parentElement.style.position = "relative";
+        element.parentElement.appendChild(feedback);
+
+        // Bir süre sonra mesajı kaldır
+        setTimeout(() => {
+            feedback.remove();
+        }, 1500);
+    }
+
     function copyPassword(id) {
         var input = document.getElementById("pwd_" + id);
+        // Eski tarayıcı desteği için, input.type = "text" yapıp kopyala
         input.type = "text";
         input.select();
         input.setSelectionRange(0, 99999);
         document.execCommand("copy");
         input.type = "password";
+        showCopyFeedback("pwd_" + id); // Geri bildirim göster
     }
 
     function copyUser(id) {
@@ -132,23 +213,31 @@
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
+        showCopyFeedback("user_" + id); // Geri bildirim göster
     }
 
-       function copyIp(id) {
+    function copyIp(id) {
         var copyText = document.getElementById("ip_" + id);
         copyText.select();
         copyText.setSelectionRange(0, 99999);
         navigator.clipboard.writeText(copyText.value);
+        showCopyFeedback("ip_" + id); // Geri bildirim göster
     }
 
     function filterByKurum(kurum) {
-        var rows = document.querySelectorAll("#connectionTable tbody tr");
-        rows.forEach(row => {
-            if (kurum === "" || row.getAttribute("data-kurum") === kurum) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
+        // ... (Vurgulama kısmı aynı kalmalı) ...
+
+        var listItems = document.querySelectorAll('.list-group-item');
+        listItems.forEach(item => {
+            item.classList.remove('active-kurum');
         });
+
+        var selectedItem = document.querySelector(`[data-kurum-id='${kurum}']`);
+        if (selectedItem) {
+            selectedItem.classList.add('active-kurum');
+        }
+
+        // Kurum filtresi uygulandıktan sonra, mevcut arama filtresini de uygula
+        filterTable();
     }
 </script>
