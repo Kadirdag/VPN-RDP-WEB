@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VPN_RDP_Manager_Web.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Sockets;
+
 
 namespace VPN_RDP_Manager_Web.Controllers
 {
@@ -129,6 +131,46 @@ namespace VPN_RDP_Manager_Web.Controllers
                                .ToList();
 
             return PartialView("_ConnectionList", data);
+        }
+
+
+        [HttpGet]
+        public JsonResult CheckServerStatus(string ip)
+        {
+            // 1. DEĞİŞKENİ EN BAŞTA TANIMLIYORUZ (Hatanın sebebi bunun eksik veya aşağıda olmasıydı)
+            bool isOnline = false;
+
+            // IP boşsa direkt false dön
+            if (string.IsNullOrEmpty(ip))
+            {
+                return Json(new { isOnline = false });
+            }
+
+            try
+            {
+                using (var client = new TcpClient())
+                {
+                    // 3389 Portuna (RDP) bağlanmayı dene
+                    var result = client.BeginConnect(ip, 3389, null, null);
+
+                    // 1 Saniye bekle (Timeout)
+                    var success = result.AsyncWaitHandle.WaitOne(TimeSpan.FromSeconds(1));
+
+                    if (success)
+                    {
+                        client.EndConnect(result);
+                        isOnline = true; // Bağlantı başarılıysa true yap
+                    }
+                }
+            }
+            catch
+            {
+                // Hata olursa false kalır
+                isOnline = false;
+            }
+
+            // 2. SONUCU DÖNDÜRÜYORUZ (.NET Core için AllowGet sildik, temiz hali budur)
+            return Json(new { isOnline = isOnline });
         }
     }
 }

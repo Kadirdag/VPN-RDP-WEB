@@ -44,6 +44,54 @@
         margin-top: 5px;
         margin-bottom: 5px;
     }
+    /* Durum Topu Tasarımı */
+.status-dot {
+    height: 12px;
+    width: 12px;
+    background-color: #bbb; /* Varsayılan gri (kontrol ediliyor) */
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    box-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
+/* Aktif (Online) Durum - Parlayan Yeşil */
+.status-online {
+    background-color: #28a745;
+    box-shadow: 0 0 5px #28a745;
+}
+
+/* Pasif (Offline) Durum - Kırmızı */
+.status-offline {
+    background-color: #dc3545;
+}
+
+/* Kontrol Ediliyor (Animasyonlu Sarı) */
+.status-checking {
+    background-color: #ffc107;
+    animation: blink 1s infinite;
+}
+
+    @@keyframes blink {
+        0% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.5;
+        }
+
+        100% {
+            opacity: 1;
+        }
+    }
+
+    /* Diğer CSS kodların aynen kalabilir */
+    .status-checking {
+        background-color: #ffc107;
+        animation: blink 1s infinite;
+    }
+
 </style>
 
 
@@ -94,6 +142,7 @@
                     <th style="min-width:220px;">ŞİFRE</th>
                     <th>TIP</th>
                     <th>KAYIT_ANI</th>
+                    <th>BAĞLANTI</th>
                     <th>İşlemler</th>
                 </tr>
             </thead>
@@ -126,6 +175,16 @@
                         </td>
                         <td>@item.TIP</td>
                         <td>@item.KAYIT_ANI</td>
+
+                        <td style="text-align:center; vertical-align:middle;">
+                            <span class="status-dot status-checking"
+                                  id="dot_@item.SYS_NO"
+                                  data-ip="@item.IP"
+                                  title="Bağlantı kontrol ediliyor..."
+                                  style="margin: 0; cursor: help;">
+                            </span>
+                        </td>
+
                         <td>
                             <div class="btn-group">
                                 <a asp-action="Edit" asp-route-id="@item.SYS_NO" class="btn btn-warning btn-sm">✏️ Düzelt</a>
@@ -239,5 +298,80 @@
 
         // Kurum filtresi uygulandıktan sonra, mevcut arama filtresini de uygula
         filterTable();
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Sayfadaki "status-dot" sınıfına sahip TÜM elementleri bul
+        const dots = document.querySelectorAll('.status-dot');
+
+        runChecks();
+
+        setInterval(runChecks, 10000);
+
+        // 2. Hepsini tek tek döngüye sok
+        dots.forEach(dot => {
+            const ip = dot.getAttribute('data-ip'); // HTML'den IP'yi oku
+            const elementId = dot.id;               // HTML'den ID'yi al
+
+            // IP varsa kontrole gönder
+            if (ip && ip.trim() !== "") {
+                checkServerStatus(ip, elementId);
+            } else {
+                // IP yoksa gri yap bırak
+                dot.classList.remove("status-checking");
+                dot.style.backgroundColor = "#ccc";
+            }
+        });
+    });
+
+    function runChecks() {
+        const dots = document.querySelectorAll('.status-dot');
+
+        dots.forEach(dot => {
+            const ip = dot.getAttribute('data-ip');
+            const elementId = dot.id;
+
+            if (ip && ip.trim() !== "") {
+                // Eğer zaten kontrol ediliyorsa (sarıysa) tekrar istek atma
+                // if (!dot.classList.contains("status-checking")) {
+                checkServerStatus(ip, elementId);
+                // }
+            } else {
+                dot.classList.remove("status-checking");
+                dot.style.backgroundColor = "#ccc";
+            }
+        });
+    }
+
+    function checkServerStatus(ip, elementId) {
+        // DİKKAT: Controller adın "Connection" ise adres "/Connection/..." olmalı.
+        // Eğer "/api/" kullanmıyorsan burayı düzelttim:
+        fetch('/Connection/CheckServerStatus?ip=' + ip + '&t=' + new Date().getTime())
+            .then(response => response.json())
+            .then(data => {
+                const dot = document.getElementById(elementId);
+                dot.classList.remove("status-checking"); // Yanıp sönmeyi durdur
+
+
+                dot.classList.remove("status-online");
+                dot.classList.remove("status-offline");
+
+                if (data.isOnline) {
+                    dot.classList.add("status-online"); // YEŞİL
+                    dot.title = "Sunucu Aktif (3389 Portu Açık)";
+                } else {
+                    dot.classList.add("status-offline"); // KIRMIZI
+                    dot.title = "Erişim Yok / Kapalı";
+                }
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                const dot = document.getElementById(elementId);
+                if (dot) {
+                    dot.classList.remove("status-checking");
+                    dot.classList.remove("status-online"); // Yeşili sil
+                    dot.classList.add("status-offline");   // Kırmızı yap
+                }
+            });
     }
 </script>
