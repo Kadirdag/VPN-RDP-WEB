@@ -189,3 +189,8 @@ Ekranlarda kullanıcı bazlı ekrana getirme için gerekli
 ALTER TABLE CONNECTIONS ADD KULLANICI_KODU NVARCHAR(50) NULL;
 ```
 
+
+"C:\OptimusRDP" path ine  baglan.ps1 i koyman gerekir.
+Masaüstüne ayar.reg i koyup çalıştırman gerekir
+
+
