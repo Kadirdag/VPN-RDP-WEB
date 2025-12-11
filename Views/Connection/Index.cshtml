@@ -142,7 +142,7 @@
                     <th style="min-width:220px;">ŞİFRE</th>
                     <th>TIP</th>
                     <th>KAYIT_ANI</th>
-                    <th>BAĞLANTI</th>
+                    <th style="min-width:150px;">BAĞLANTI</th>
                     <th>İşlemler</th>
                 </tr>
             </thead>
@@ -177,12 +177,22 @@
                         <td>@item.KAYIT_ANI</td>
 
                         <td style="text-align:center; vertical-align:middle;">
-                            <span class="status-dot status-checking"
-                                  id="dot_@item.SYS_NO"
-                                  data-ip="@item.IP"
-                                  title="Bağlantı kontrol ediliyor..."
-                                  style="margin: 0; cursor: help;">
-                            </span>
+                            <div class="d-flex align-items-center justify-content-center">
+
+                                <span class="status-dot status-checking me-2"
+                                      id="dot_@item.SYS_NO"
+                                      data-ip="@item.IP"
+                                      style="cursor: help;">
+                                </span>
+
+                                <a href="optimus://@item.IP$$@Uri.EscapeDataString(item.KULLANICI)$$@Uri.EscapeDataString(item.SIFRE)"
+                                   class="btn btn-outline-success btn-sm py-0 px-2"
+                                   style="font-size: 0.8rem; height: 24px; line-height: 22px; font-weight:bold;"
+                                   title="Otomatik Giriş">
+                                    <i class="fas fa-magic"></i> Giriş Yap
+                                </a>
+
+                            </div>
                         </td>
 
                         <td>

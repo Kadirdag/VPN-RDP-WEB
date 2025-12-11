@@ -137,10 +137,10 @@ namespace VPN_RDP_Manager_Web.Controllers
         [HttpGet]
         public JsonResult CheckServerStatus(string ip)
         {
-            // 1. DEĞİŞKENİ EN BAŞTA TANIMLIYORUZ (Hatanın sebebi bunun eksik veya aşağıda olmasıydı)
+            // ADIM 1: Değişkeni EN BAŞTA tanımlıyoruz (Hatanın çözümü bu)
             bool isOnline = false;
 
-            // IP boşsa direkt false dön
+            // IP boş gelirse direkt false dönüyoruz
             if (string.IsNullOrEmpty(ip))
             {
                 return Json(new { isOnline = false });
@@ -150,7 +150,7 @@ namespace VPN_RDP_Manager_Web.Controllers
             {
                 using (var client = new TcpClient())
                 {
-                    // 3389 Portuna (RDP) bağlanmayı dene
+                    // 3389 (RDP) Portuna bağlanmayı dene
                     var result = client.BeginConnect(ip, 3389, null, null);
 
                     // 1 Saniye bekle (Timeout)
@@ -159,18 +159,56 @@ namespace VPN_RDP_Manager_Web.Controllers
                     if (success)
                     {
                         client.EndConnect(result);
-                        isOnline = true; // Bağlantı başarılıysa true yap
+                        // Burada isOnline değişkenini kullanıyoruz, o yüzden yukarıda tanımlı olması şart!
+                        isOnline = true;
                     }
                 }
             }
             catch
             {
-                // Hata olursa false kalır
+                // Hata durumunda
                 isOnline = false;
             }
 
-            // 2. SONUCU DÖNDÜRÜYORUZ (.NET Core için AllowGet sildik, temiz hali budur)
+            // ADIM 2: Sonucu gönderiyoruz
             return Json(new { isOnline = isOnline });
         }
+
+
+        [HttpGet]
+        public IActionResult DownloadRdp(int id)
+        {
+            var item = _context.CONNECTIONS.FirstOrDefault(x => x.SYS_NO == id);
+
+            if (item == null) return NotFound();
+
+            // --- HATA ÇÖZÜMÜ BURADA ---
+            // Null gelme ihtimaline karşı önlem aldık.
+            int gelenPort = item.PORT.GetValueOrDefault();
+            int portToUse = (gelenPort == 0) ? 3389 : gelenPort;
+            // --------------------------
+
+            var sb = new System.Text.StringBuilder();
+
+            sb.AppendLine($"full address:s:{item.IP}:{portToUse}");
+            sb.AppendLine($"username:s:{item.KULLANICI}");
+            sb.AppendLine("screen mode id:i:2");
+            sb.AppendLine("session bpp:i:32");
+            sb.AppendLine("compression:i:1");
+            sb.AppendLine("keyboardhook:i:2");
+            sb.AppendLine("displayconnectionbar:i:1");
+            sb.AppendLine("disable wallpaper:i:0");
+            sb.AppendLine("allow font smoothing:i:1");
+
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
+
+            string fileName = $"{item.KURUM}_{item.IP}.rdp";
+
+            return File(fileBytes, "application/x-rdp", fileName);
+        }
+
+
+
+
     }
 }
